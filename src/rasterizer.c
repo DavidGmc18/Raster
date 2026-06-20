@@ -1,4 +1,5 @@
 #include "rasterizer.h"
+#include <stdbool.h>
 
 #define UPDATE_BOUNDS(vertex) { \
     int x = (int)((vertex)->position.x); \
@@ -12,7 +13,7 @@
 // TODO move out of this file
 // TODO better fragment shader
 // TODO depth buffer
-const vec4* fragment_shader(const RenderContext* ctx, vec4* color) {
+static inline const vec4* fragment_shader(const RenderContext* ctx, vec4* color) {
     return color;
 }
 
@@ -48,6 +49,29 @@ void rasterize(const RenderContext* ctx, const Vertex* A, const Vertex* B, const
 
     float inverse_area = 1.0f / total_area;
 
+    float z_row = (wa_row * A->position.z + wb_row * B->position.z + wc_row * C->position.z) * inverse_area;
+    float z_dy = (-bc.x * A->position.z + -ca.x * B->position.z + -ab.x * C->position.z) * inverse_area;
+    float z_dx = (bc.y * A->position.z + ca.y * B->position.z + ab.y * C->position.z) * inverse_area;
+
+    vec4 color_row = {
+        .r = (wa_row * A->color.r + wb_row * B->color.r + wc_row * C->color.r) * inverse_area,
+        .g = (wa_row * A->color.g + wb_row * B->color.g + wc_row * C->color.g) * inverse_area,
+        .b = (wa_row * A->color.b + wb_row * B->color.b + wc_row * C->color.b) * inverse_area,
+        .a = (wa_row * A->color.a + wb_row * B->color.a + wc_row * C->color.a) * inverse_area
+    };
+    vec4 color_dy = {
+        .r = (-bc.x * A->color.r + -ca.x * B->color.r + -ab.x * C->color.r) * inverse_area,
+        .g = (-bc.x * A->color.g + -ca.x * B->color.g + -ab.x * C->color.g) * inverse_area,
+        .b = (-bc.x * A->color.b + -ca.x * B->color.b + -ab.x * C->color.b) * inverse_area,
+        .a = (-bc.x * A->color.a + -ca.x * B->color.a + -ab.x * C->color.a) * inverse_area
+    };
+    vec4 color_dx = {
+        .r = (bc.y * A->color.r + ca.y * B->color.r + ab.y * C->color.r) * inverse_area,
+        .g = (bc.y * A->color.g + ca.y * B->color.g + ab.y * C->color.g) * inverse_area,
+        .b = (bc.y * A->color.b + ca.y * B->color.b + ab.y * C->color.b) * inverse_area,
+        .a = (bc.y * A->color.a + ca.y * B->color.a + ab.y * C->color.a) * inverse_area
+    };
+
     for (int y = min_y; y < max_y; y++) {
         int j = y * ctx->pitch;
 
@@ -55,34 +79,53 @@ void rasterize(const RenderContext* ctx, const Vertex* A, const Vertex* B, const
         float wb = wb_row;
         float wc = wc_row;
 
+        float z = z_row;
+
+        vec4 color = color_row;
+
+        bool flag = false;
         for (int x = min_x; x < max_x; x++) {
-            if (wa >= 0.0f && wb >= 0.0f && wc >= 0.0f) {
-                float alpha = wa * inverse_area;
-                float beta = wb * inverse_area;
-                float gamma = wc * inverse_area;
+            if (wa >= 0.0f && wb >= 0.0f && wc >= 0.0f && z <= ctx->depth_buffer[j + x]) {
+                if (!flag && x != min_x) {
+                    int d = x - min_x;
+                    z += d * z_dx;
 
-                float z = alpha * A->position.z + beta * B->position.z + gamma * C->position.z;
-
-                vec4 color = {
-                    .r = alpha * A->color.r + beta * B->color.r + gamma * C->color.r,
-                    .g = alpha * A->color.g + beta * B->color.g + gamma * C->color.g,
-                    .b = alpha * A->color.b + beta * B->color.b + gamma * C->color.b,
-                    .a = alpha * A->color.a + beta * B->color.a + gamma * C->color.a
-                };
-
-                if (z > ctx->depth_buffer[j + x]) continue;
+                    color.r += d * color_dx.r;
+                    color.g += d * color_dx.g;
+                    color.b += d * color_dx.b;
+                    color.a += d * color_dx.a;
+                }
 
                 ctx->pixels[j + x] = *fragment_shader(ctx, &color);
                 ctx->depth_buffer[j + x] = z;
+                flag = true;
+            } else if (flag) {
+                break;
             }
 
             wa += bc.y;
             wb += ca.y;
             wc += ab.y;
+
+            if (flag) {
+                z += z_dx;
+
+                color.r += color_dx.r;
+                color.g += color_dx.g;
+                color.b += color_dx.b;
+                color.a += color_dx.a;
+            }
         }
 
         wa_row -= bc.x;
         wb_row -= ca.x;
         wc_row -= ab.x;
+
+        z_row += z_dy;
+
+        color_row.r += color_dy.r;
+        color_row.g += color_dy.g;
+        color_row.b += color_dy.b;
+        color_row.a += color_dy.a;
     }
 }
