@@ -4,6 +4,8 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "linalg.h"
+#include <math.h>
 
 const int WIDTH = 1280;
 const int HEIGHT = 720;
@@ -78,6 +80,10 @@ int main() {
         }
 
         uint64_t start = SDL_GetTicksNS();
+
+        float t = 3.14f * (float)start / 1000000000.0f;
+        float r = 0.4f;
+        translate(&triangle.model, (vec3){r * cos(t), r * sin(t), 0.0f});
 
         // Clear buffers
         clearColorBuffer(&ctx, vec4(0.0f, 0.0f, 0.0f, 1.0f));
