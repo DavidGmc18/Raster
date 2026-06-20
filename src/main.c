@@ -66,7 +66,8 @@ int main() {
     Object triangle = {
         .vertices = vertices,
         .indices = indices,
-        .count = 3
+        .count = 3,
+        .model = IDENTITY_MAT4
     };
 
     bool running = true;
@@ -83,10 +84,6 @@ int main() {
         clearDepthBuffer(&ctx, 1.0f);
         
         // Render
-        render(&ctx, &triangle);
-        render(&ctx, &triangle);
-        render(&ctx, &triangle);
-        render(&ctx, &triangle);
         render(&ctx, &triangle);
 
         uint64_t end = SDL_GetTicksNS();

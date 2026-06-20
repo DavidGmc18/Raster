@@ -21,8 +21,21 @@ void clearDepthBuffer(const RenderContext* ctx, float clear_value) {
 }
 
 // TODO move out of this file
+vec4 vec4_mul_mat4(const vec4* vec, const mat4* mat) {
+    vec4 out = {0.0f, 0.0f, 0.0f, 0.0f};
+    for (int m = 0; m < 4; m++) {
+        for (int k = 0; k < 4; k++) {
+            out.v[m] += vec->v[k] * mat->v[k].v[m];
+        }
+    }
+    return out;
+}
+
+// TODO move out of this file
 // TODO better vertex shader
-void vertex_shader(const RenderContext* ctx, Vertex* vertex) {
+void vertex_shader(const RenderContext* ctx, const Object* obj, Vertex* vertex) {
+    vertex->position = vec4_mul_mat4(&vertex->position, &obj->model);
+
     vertex->position.x =  ((0.5f * vertex->position.x) + 0.5f) * ctx->w;
     vertex->position.y = ((-0.5f * vertex->position.y) + 0.5f) * ctx->h;
 }
@@ -43,9 +56,9 @@ void render(const RenderContext* ctx, const Object* obj) {
         Vertex v1 = obj->vertices[i1];
         Vertex v2 = obj->vertices[i2];
 
-        vertex_shader(ctx, &v0);
-        vertex_shader(ctx, &v1);
-        vertex_shader(ctx, &v2);
+        vertex_shader(ctx, obj, &v0);
+        vertex_shader(ctx, obj, &v1);
+        vertex_shader(ctx, obj, &v2);
 
         rasterize(ctx, &v0, &v1, &v2);
     }

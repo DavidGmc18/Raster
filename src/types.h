@@ -31,6 +31,21 @@ typedef union vec4_t {
 
 
 
+typedef union mat4_t {
+    float m[16];
+    vec4 v[4];
+    struct { vec4 x, y, z, w; };
+    struct { vec4 i, j, k, l; };
+    struct { vec4 a, b, c, d; };
+} mat4;
+
+#define IDENTITY_MAT4 { .m = { \
+    1.0f, 0.0f, 0.0f, 0.0f, \
+    0.0f, 1.0f, 0.0f, 0.0f, \
+    0.0f, 0.0f, 1.0f, 0.0f, \
+    0.0f, 0.0f, 0.0f, 1.0f, \
+}}
+
 typedef vec4 Pixel;
 typedef struct pixel_buffer_t {
     int w, h;
@@ -50,4 +65,5 @@ typedef struct object_t {
     Vertex* vertices;
     unsigned int* indices;
     unsigned int count;
+    mat4 model;
 } Object;
