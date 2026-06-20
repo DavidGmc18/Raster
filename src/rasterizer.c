@@ -73,7 +73,7 @@ void rasterize(const RenderContext* ctx, const Vertex* A, const Vertex* B, const
     };
 
     for (int y = min_y; y < max_y; y++) {
-        int j = y * ctx->pitch;
+        int i = y * ctx->pitch + min_x;
 
         float wa = wa_row;
         float wb = wb_row;
@@ -85,7 +85,7 @@ void rasterize(const RenderContext* ctx, const Vertex* A, const Vertex* B, const
 
         bool flag = false;
         for (int x = min_x; x < max_x; x++) {
-            if (wa >= 0.0f && wb >= 0.0f && wc >= 0.0f && z <= ctx->depth_buffer[j + x]) {
+            if (wa >= 0.0f && wb >= 0.0f && wc >= 0.0f) {
                 if (!flag && x != min_x) {
                     int d = x - min_x;
                     z += d * z_dx;
@@ -96,12 +96,15 @@ void rasterize(const RenderContext* ctx, const Vertex* A, const Vertex* B, const
                     color.a += d * color_dx.a;
                 }
 
-                ctx->pixels[j + x] = *fragment_shader(ctx, &color);
-                ctx->depth_buffer[j + x] = z;
+                if (z <= ctx->depth_buffer[i]) {
+                    ctx->pixels[i] = *fragment_shader(ctx, &color);
+                    ctx->depth_buffer[i] = z;
+                }
+
                 flag = true;
-            } else if (flag) {
-                break;
-            }
+            } else if (flag) break;
+
+            i++;
 
             wa += bc.y;
             wb += ca.y;
