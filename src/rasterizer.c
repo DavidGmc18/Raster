@@ -61,6 +61,8 @@ void rasterize(const RenderContext* ctx, const Vertex* A, const Vertex* B, const
                 float beta = wb * inverse_area;
                 float gamma = wc * inverse_area;
 
+                float z = alpha * A->position.z + beta * B->position.z + gamma * C->position.z;
+
                 vec4 color = {
                     .r = alpha * A->color.r + beta * B->color.r + gamma * C->color.r,
                     .g = alpha * A->color.g + beta * B->color.g + gamma * C->color.g,
@@ -68,7 +70,10 @@ void rasterize(const RenderContext* ctx, const Vertex* A, const Vertex* B, const
                     .a = alpha * A->color.a + beta * B->color.a + gamma * C->color.a
                 };
 
+                if (z > ctx->depth_buffer[j + x]) continue;
+
                 ctx->pixels[j + x] = *fragment_shader(ctx, &color);
+                ctx->depth_buffer[j + x] = z;
             }
 
             wa += bc.y;
