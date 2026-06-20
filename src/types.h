@@ -39,7 +39,7 @@ typedef union mat4_t {
     struct { vec4 a, b, c, d; };
 } mat4;
 
-#define IDENTITY_MAT4 { .m = { \
+#define IDENTITY_MAT4 (mat4){ .m = { \
     1.0f, 0.0f, 0.0f, 0.0f, \
     0.0f, 1.0f, 0.0f, 0.0f, \
     0.0f, 0.0f, 1.0f, 0.0f, \

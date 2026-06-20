@@ -1,6 +1,7 @@
 #include "render.h"
 #include <assert.h>
 #include "rasterizer.h"
+#include "linalg.h"
 
 void clearColorBuffer(const RenderContext* ctx, vec4 clear_color) {
     assert(ctx && "Render context is NULL!");
@@ -21,20 +22,9 @@ void clearDepthBuffer(const RenderContext* ctx, float clear_value) {
 }
 
 // TODO move out of this file
-vec4 vec4_mul_mat4(const vec4* vec, const mat4* mat) {
-    vec4 out = {0.0f, 0.0f, 0.0f, 0.0f};
-    for (int m = 0; m < 4; m++) {
-        for (int k = 0; k < 4; k++) {
-            out.v[m] += vec->v[k] * mat->v[k].v[m];
-        }
-    }
-    return out;
-}
-
-// TODO move out of this file
 // TODO better vertex shader
 void vertex_shader(const RenderContext* ctx, const Object* obj, Vertex* vertex) {
-    vertex->position = vec4_mul_mat4(&vertex->position, &obj->model);
+    vertex->position = mat4_mul_vec4(&obj->model, &vertex->position);
 
     vertex->position.x =  ((0.5f * vertex->position.x) + 0.5f) * ctx->w;
     vertex->position.y = ((-0.5f * vertex->position.y) + 0.5f) * ctx->h;
