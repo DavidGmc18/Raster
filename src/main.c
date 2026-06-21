@@ -79,28 +79,38 @@ int main() {
             if (event.type == SDL_EVENT_QUIT) running = false;
         }
 
-        uint64_t start = SDL_GetTicksNS();
+        uint64_t A = SDL_GetTicksNS();
 
         triangle.model = IDENTITY_MAT4;
-        float t = 3.14f * (float)start / 1000000000.0f;
+        float t = 3.14f * (float)A / 1000000000.0f;
         float r = 0.4f;
         translate(&triangle.model, (vec3){r * cos(t), r * sin(t), 0.0f});
         rotate(&triangle.model, quat_rotation(vec3(0.0f, 0.0f, 1.0f), t));
 
+        uint64_t B = SDL_GetTicksNS();
+
         // Clear buffers
         clearColorBuffer(&ctx, vec4(0.0f, 0.0f, 0.0f, 1.0f));
         clearDepthBuffer(&ctx, 1.0f);
+
+        uint64_t C = SDL_GetTicksNS();
         
         // Render
         render(&ctx, &triangle);
 
-        uint64_t end = SDL_GetTicksNS();
-        float time = (float)(end - start) / 1000000.0f;
-        printf("Render time = %.3f ms\n", time);
+        uint64_t D = SDL_GetTicksNS();
 
         // Present
         SDL_BlitSurface(canvas, NULL, surface, NULL);
         SDL_UpdateWindowSurface(window);
+
+        uint64_t E = SDL_GetTicksNS();
+
+        float translation_time = (float)(B - A) / 1000000.0f;
+        float clear_time = (float)(C - B) / 1000000.0f;
+        float render_time = (float)(D - C) / 1000000.0f;
+        float present_time = (float)(E - D) / 1000000.0f;
+        printf("Translation-Clear-Render-Present times:  %.1f ms  %.1f ms  %.1f ms  %.1f ms\n", translation_time, clear_time, render_time, present_time);
     }
 
     free(ctx.depth_buffer);

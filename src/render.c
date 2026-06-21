@@ -6,8 +6,9 @@
 void clearColorBuffer(const RenderContext* ctx, vec4 clear_color) {
     assert(ctx && "Render context is NULL!");
     for (int y = 0; y < ctx->h; y++) {
+        int i = y * ctx->pitch;
         for (int x = 0; x < ctx->w; x++) {
-            ctx->pixels[y * ctx->pitch + x] = clear_color;
+            ctx->pixels[i++] = clear_color;
         }
     }
 }
@@ -15,8 +16,9 @@ void clearColorBuffer(const RenderContext* ctx, vec4 clear_color) {
 void clearDepthBuffer(const RenderContext* ctx, float clear_value) {
     assert(ctx && "Render context is NULL!");
     for (int y = 0; y < ctx->h; y++) {
+        int i = y * ctx->pitch;
         for (int x = 0; x < ctx->w; x++) {
-            ctx->depth_buffer[y * ctx->pitch + x] = clear_value;
+            ctx->depth_buffer[i++] = clear_value;
         }
     }
 }
