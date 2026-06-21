@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "linalg.h"
 #include <math.h>
+#include "copy.h"
 
 const int WIDTH = 1280;
 const int HEIGHT = 720;
@@ -100,17 +101,27 @@ int main() {
 
         uint64_t D = SDL_GetTicksNS();
 
+        // Copy
+        copy(&ctx, surface);
+    
+        uint64_t E = SDL_GetTicksNS();
+
         // Present
-        SDL_BlitSurface(canvas, NULL, surface, NULL);
         SDL_UpdateWindowSurface(window);
 
-        uint64_t E = SDL_GetTicksNS();
+        uint64_t F = SDL_GetTicksNS();
 
         float translation_time = (float)(B - A) / 1000000.0f;
         float clear_time = (float)(C - B) / 1000000.0f;
         float render_time = (float)(D - C) / 1000000.0f;
-        float present_time = (float)(E - D) / 1000000.0f;
-        printf("Translation-Clear-Render-Present times:  %.1f ms  %.1f ms  %.1f ms  %.1f ms\n", translation_time, clear_time, render_time, present_time);
+        float copy_time = (float)(E - D) / 1000000.0f;
+        float present_time = (float)(F - E) / 1000000.0f;
+        float total = (float)(F - A) / 1000000.0f;
+        float frame_rate = 1000.0f / total;
+        printf(
+            "Translation-Clear-Render-Copy-Present times:  %.1f ms  %.1f ms  %.1f ms  %.1f ms  %.1f ms    Total:  %.1f ms    FPS:  %.1f\n",
+            translation_time, clear_time, render_time, copy_time, present_time, total, frame_rate
+        );
     }
 
     free(ctx.depth_buffer);
