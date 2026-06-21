@@ -3,10 +3,10 @@
 #include "render.h"
 #include <assert.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include "linalg.h"
 #include <math.h>
 #include "copy.h"
+#include "metrics.h"
 
 const int WIDTH = 1280;
 const int HEIGHT = 720;
@@ -83,7 +83,7 @@ int main() {
         uint64_t A = SDL_GetTicksNS();
 
         triangle.model = IDENTITY_MAT4;
-        float t = 3.14f * (float)A / 1000000000.0f;
+        float t = (float)A / 1000000000.0f;
         float r = 0.4f;
         translate(&triangle.model, (vec3){r * cos(t), r * sin(t), 0.0f});
         rotate(&triangle.model, quat_rotation(vec3(0.0f, 0.0f, 1.0f), t));
@@ -111,17 +111,7 @@ int main() {
 
         uint64_t F = SDL_GetTicksNS();
 
-        float translation_time = (float)(B - A) / 1000000.0f;
-        float clear_time = (float)(C - B) / 1000000.0f;
-        float render_time = (float)(D - C) / 1000000.0f;
-        float copy_time = (float)(E - D) / 1000000.0f;
-        float present_time = (float)(F - E) / 1000000.0f;
-        float total = (float)(F - A) / 1000000.0f;
-        float frame_rate = 1000.0f / total;
-        printf(
-            "Translation-Clear-Render-Copy-Present times:  %.1f ms  %.1f ms  %.1f ms  %.1f ms  %.1f ms    Total:  %.1f ms    FPS:  %.1f\n",
-            translation_time, clear_time, render_time, copy_time, present_time, total, frame_rate
-        );
+        metrics_mark(B - A, C - B, D - C, E - D, F - E);
     }
 
     free(ctx.depth_buffer);
