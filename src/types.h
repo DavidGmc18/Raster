@@ -1,5 +1,6 @@
 #pragma once
 
+// vec2
 typedef union vec2_t {
     float v[2];
     struct { float x, y; };
@@ -8,6 +9,7 @@ typedef union vec2_t {
 
 #define vec2(a, b) ((vec2){.v = {a, b}})
 
+// vec3
 typedef union vec3_t {
     float v[3];
     struct { float x, y, z; };
@@ -17,6 +19,7 @@ typedef union vec3_t {
 
 #define vec3(a, b, c) ((vec3){.v = {a, b, c}})
 
+// vec4
 typedef union vec4_t {
     float v[4];
     struct { float x, y, z, w; };
@@ -29,8 +32,14 @@ typedef union vec4_t {
 #define _vec4_4f(a, b, c, d) ((vec4){.v = {a, b, c, d}})
 #define vec4(...) _vec4_dispatch(__VA_ARGS__, _vec4_4f, _vec4_3f)(__VA_ARGS__)
 
+// quat
+typedef struct quat_t {
+    float i, j, k, w;
+} quat;
 
+#define QUAT_IDENTITY (quat){0.0f, 0.0f, 0.0f, 1.0f}
 
+// mat4
 typedef union mat4_t {
     float m[16];
     vec4 v[4];
@@ -39,6 +48,13 @@ typedef union mat4_t {
     struct { vec4 a, b, c, d; };
 } mat4;
 
+#define ZERO_MAT4 (mat4){ .m = { \
+    0.0f, 0.0f, 0.0f, 0.0f, \
+    0.0f, 0.0f, 0.0f, 0.0f, \
+    0.0f, 0.0f, 0.0f, 0.0f, \
+    0.0f, 0.0f, 0.0f, 0.0f, \
+}}
+
 #define IDENTITY_MAT4 (mat4){ .m = { \
     1.0f, 0.0f, 0.0f, 0.0f, \
     0.0f, 1.0f, 0.0f, 0.0f, \
@@ -46,6 +62,7 @@ typedef union mat4_t {
     0.0f, 0.0f, 0.0f, 1.0f, \
 }}
 
+// rendering types
 typedef vec4 Pixel;
 typedef struct pixel_buffer_t {
     int w, h;
