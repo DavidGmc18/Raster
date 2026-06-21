@@ -29,7 +29,7 @@ $(BINARY): $(OBJECTS)
 $(BUILD_DIR)/obj/%.o: %
 	@mkdir -p $(@D)
 	@echo "Compiling $(subst $(SOURCE_DIR)/,,$<)"
-	@$(C) $(CFLAGS_SRC) $(INCLUDES) -MMD -MP -c $< -o $@
+	@$(C) $(CFLAGS) $(INCLUDES) -MMD -MP -c $< -o $@
 
 
 # Run
