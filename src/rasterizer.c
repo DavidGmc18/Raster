@@ -98,8 +98,9 @@ void rasterize(const RenderContext* ctx, const Vertex* A, const Vertex* B, const
                 }
 
                 if (z <= ctx->depth_buffer[i]) {
-                    // TODO handle opacity
-                    ctx->pixels[i] = color;
+                    ctx->pixels[i].r += color.a * (color.r - ctx->pixels[i].r);
+                    ctx->pixels[i].g += color.a * (color.g - ctx->pixels[i].g);
+                    ctx->pixels[i].b += color.a * (color.b - ctx->pixels[i].b);
                     ctx->depth_buffer[i] = z;
                 }
 
