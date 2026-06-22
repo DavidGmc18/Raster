@@ -10,12 +10,10 @@
     if (y > max_y) max_y = y; \
 }
 
-// TODO move out of this file
-// TODO better fragment shader
-// TODO depth buffer
-static inline const vec4* fragment_shader(const RenderContext* ctx, vec4* color) {
-    return color;
-}
+// TODO fragment shader
+// static inline const vec4* fragment_shader(const RenderContext* ctx, vec4* color) {
+//     return color;
+// }
 
 void rasterize(const RenderContext* ctx, const Vertex* A, const Vertex* B, const Vertex* C) {
     int min_x = ctx->w;
@@ -32,13 +30,13 @@ void rasterize(const RenderContext* ctx, const Vertex* A, const Vertex* B, const
     if (min_y < 0) min_y = 0;
     if (max_y > ctx->h) max_y = ctx->h;
 
-    vec2 ab = {B->position.x - A->position.x, B->position.y - A->position.y};
-    vec2 bc = {C->position.x - B->position.x, C->position.y - B->position.y};
-    vec2 ca = {A->position.x - C->position.x, A->position.y - C->position.y};
+    vec2 ab = vec2(B->position.x - A->position.x, B->position.y - A->position.y);
+    vec2 bc = vec2(C->position.x - B->position.x, C->position.y - B->position.y);
+    vec2 ca = vec2(A->position.x - C->position.x, A->position.y - C->position.y);
 
-    vec2 ap = {min_x - A->position.x, min_y - A->position.y};
-    vec2 bp = {min_x - B->position.x, min_y - B->position.y};
-    vec2 cp = {min_x - C->position.x, min_y - C->position.y};
+    vec2 ap = vec2(min_x - A->position.x, min_y - A->position.y);
+    vec2 bp = vec2(min_x - B->position.x, min_y - B->position.y);
+    vec2 cp = vec2(min_x - C->position.x, min_y - C->position.y);
 
     float wa_row = (bp.x * bc.y) - (bp.y * bc.x);
     float wb_row = (cp.x * ca.y) - (cp.y * ca.x);
@@ -97,7 +95,7 @@ void rasterize(const RenderContext* ctx, const Vertex* A, const Vertex* B, const
                 }
 
                 if (z <= ctx->depth_buffer[i]) {
-                    ctx->pixels[i] = *fragment_shader(ctx, &color);
+                    ctx->pixels[i] = color;
                     ctx->depth_buffer[i] = z;
                 }
 

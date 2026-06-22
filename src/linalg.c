@@ -67,17 +67,17 @@ inline mat4 quat_to_mat4(quat q) {
     float wy = q.w * q.j;
     float wz = q.w * q.k;
 
-    return (mat4){
+    return mat4(
         1.0f - 2.0f * (yy + zz),    2.0f * (xy + wz),           2.0f * (xz - wy),           0.0f,
         2.0f * (xy - wz),           1.0f - 2.0f * (xx + zz),    2.0f * (yz + wx),           0.0f,
         2.0f * (xz + wy),           2.0f * (yz - wx),           1.0f - 2.0f * (xx + yy),    0.0f,
         0.0f,                       0.0f,                       0.0f,                       1.0f
-    };
+    );
 }
 
 
 inline vec4 mat4_mul_vec4(const mat4* mat, const vec4* vec) {
-    vec4 out = {0.0f, 0.0f, 0.0f, 0.0f};
+    vec4 out = vec4(0.0f, 0.0f, 0.0f, 0.0f);
     for (int m = 0; m < 4; m++)
     for (int k = 0; k < 4; k++)
         out.v[m] += mat->v[m].v[k] * vec->v[k];
