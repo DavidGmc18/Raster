@@ -32,10 +32,10 @@ Vertex vertices[] = {
     Vertex(vec4( 0.5f, -0.5f, -0.5f), vec4(0.5f, 0.5f, 0.0f, 1.0f)),
     Vertex(vec4(-0.5f, -0.5f, -0.5f), vec4(0.5f, 0.5f, 0.0f, 1.0f)),
 
-    Vertex(vec4( 0.5f, -0.5f, -0.5f), vec4(0.4f, 0.0f, 0.0f, 1.0f)),
-    Vertex(vec4( 0.5f, -0.5f,  0.5f), vec4(0.4f, 0.0f, 0.0f, 1.0f)),
-    Vertex(vec4( 0.5f,  0.5f,  0.5f), vec4(0.4f, 0.0f, 0.0f, 1.0f)),
-    Vertex(vec4( 0.5f,  0.5f, -0.5f), vec4(0.4f, 0.0f, 0.0f, 1.0f)),
+    Vertex(vec4( 0.5f, -0.5f, -0.5f), vec4(0.5f, 0.0f, 0.0f, 1.0f)),
+    Vertex(vec4( 0.5f, -0.5f,  0.5f), vec4(0.5f, 0.0f, 0.0f, 1.0f)),
+    Vertex(vec4( 0.5f,  0.5f,  0.5f), vec4(0.5f, 0.0f, 0.0f, 1.0f)),
+    Vertex(vec4( 0.5f,  0.5f, -0.5f), vec4(0.5f, 0.0f, 0.0f, 1.0f)),
 
     Vertex(vec4( 0.5f, -0.5f,  0.5f), vec4(0.0f, 0.0f, 0.5f, 1.0f)),
     Vertex(vec4(-0.5f, -0.5f,  0.5f), vec4(0.0f, 0.0f, 0.5f, 1.0f)),
