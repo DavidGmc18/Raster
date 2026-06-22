@@ -2,6 +2,55 @@
 #include <assert.h>
 #include "rasterizer.h"
 #include "linalg.h"
+#if defined(__AVX2__)
+#include <immintrin.h>
+
+void clearColorBuffer(const RenderContext* ctx, vec4 clear_color) {
+    assert(ctx && "Render context is NULL!");
+
+    __m256 color = _mm256_broadcast_ps((const __m128*)&clear_color);
+
+    for (int y = 0; y < ctx->h; y++) {
+        int j = y * ctx->pitch;
+        int x = 0;
+        
+        while (x < (ctx->w - 3)) {
+            _mm256_stream_ps((float*)&ctx->pixels[j + x + 0], color);
+            _mm256_stream_ps((float*)&ctx->pixels[j + x + 2], color);
+            x += 4;
+        }
+
+        while (x < ctx->w) {
+            ctx->pixels[j + x++] = clear_color;
+        }
+    }
+
+    _mm_sfence();
+}
+
+void clearDepthBuffer(const RenderContext* ctx, float clear_value) {
+    assert(ctx && "Render context is NULL!");
+
+    __m256 value = _mm256_set1_ps(clear_value);
+
+    for (int y = 0; y < ctx->h; y++) {
+        int j = y * ctx->pitch;
+        int x = 0;
+
+        while (x < (ctx->w - 7)) {
+            _mm256_stream_ps((float*)&ctx->depth_buffer[j + x], value);
+            x += 8;
+        }
+
+        while (x < ctx->w) {
+            ctx->depth_buffer[j + x++] = clear_value;
+        }
+    }
+
+    _mm_sfence();
+}
+
+#else
 
 void clearColorBuffer(const RenderContext* ctx, vec4 clear_color) {
     assert(ctx && "Render context is NULL!");
@@ -16,12 +65,15 @@ void clearColorBuffer(const RenderContext* ctx, vec4 clear_color) {
 void clearDepthBuffer(const RenderContext* ctx, float clear_value) {
     assert(ctx && "Render context is NULL!");
     for (int y = 0; y < ctx->h; y++) {
-        int i = y * ctx->pitch;
+        int j = y * ctx->pitch;
+
         for (int x = 0; x < ctx->w; x++) {
-            ctx->depth_buffer[i++] = clear_value;
+            ctx->depth_buffer[j + x] = clear_value;
         }
     }
 }
+
+#endif
 
 // TODO move out of this file
 // TODO better vertex shader

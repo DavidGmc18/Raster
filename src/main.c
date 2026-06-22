@@ -8,7 +8,7 @@
 #include "copy.h"
 #include "metrics.h"
 
-const int WIDTH = 1280;
+const int WIDTH = 1280; // must be multiple of 8
 const int HEIGHT = 720;
 
 // Vertex vertices[8] = {
@@ -50,13 +50,14 @@ int main() {
 
     SDL_Surface* canvas = SDL_CreateSurface(WIDTH, HEIGHT, SDL_PIXELFORMAT_RGBA128_FLOAT);
     assert(canvas && "Failed to create canvas!");
+    assert(canvas->pitch % sizeof(Pixel) == 0 && "Pitch is not multiple of sizeof(Pixel)");
 
     RenderContext ctx = {
         .w = canvas->w,
         .h = canvas->h,
         .pitch = canvas->pitch / sizeof(Pixel),
         .pixels = canvas->pixels,
-        .depth_buffer = (float*)malloc(canvas->h * (canvas->pitch / sizeof(Pixel)) * sizeof(float)) 
+        .depth_buffer = aligned_alloc(32, canvas->h * (canvas->pitch / sizeof(Pixel)) * sizeof(float))
     };
     assert(ctx.depth_buffer && "Failed to malloc depth buffer");
 
