@@ -12,12 +12,45 @@ const int WIDTH = 1280; // must be multiple of 8
 const int HEIGHT = 720;
 
 Vertex vertices[] = {
-    Vertex(vec4( 0.0f,  0.5f,  0.0f), vec4(1.0f, 0.0f, 0.0f, 1.0f)),
-    Vertex(vec4(-0.5f, -0.5f,  0.0f), vec4(0.0f, 1.0f, 0.0f, 1.0f)),
-    Vertex(vec4( 0.5f, -0.5f,  0.0f), vec4(0.0f, 0.0f, 1.0f, 1.0f))
+    Vertex(vec4(-0.5f, -0.5f, -0.5f), vec4(0.0f, 0.6f, 0.0f, 1.0f)),
+    Vertex(vec4( 0.5f, -0.5f, -0.5f), vec4(0.0f, 0.6f, 0.0f, 1.0f)),
+    Vertex(vec4( 0.5f,  0.5f, -0.5f), vec4(0.0f, 0.6f, 0.0f, 1.0f)),
+    Vertex(vec4(-0.5f,  0.5f, -0.5f), vec4(0.0f, 0.6f, 0.0f, 1.0f)),
+
+    Vertex(vec4(-0.5f, -0.5f,  0.5f), vec4(0.7f, 0.3f, 0.0f, 1.0f)),
+    Vertex(vec4(-0.5f, -0.5f, -0.5f), vec4(0.7f, 0.3f, 0.0f, 1.0f)),
+    Vertex(vec4(-0.5f,  0.5f, -0.5f), vec4(0.7f, 0.3f, 0.0f, 1.0f)),
+    Vertex(vec4(-0.5f,  0.5f,  0.5f), vec4(0.7f, 0.3f, 0.0f, 1.0f)),
+
+    Vertex(vec4(-0.5f,  0.5f, -0.5f), vec4(0.6f, 0.6f, 0.6f, 1.0f)),
+    Vertex(vec4( 0.5f,  0.5f, -0.5f), vec4(0.6f, 0.6f, 0.6f, 1.0f)),
+    Vertex(vec4( 0.5f,  0.5f,  0.5f), vec4(0.6f, 0.6f, 0.6f, 1.0f)),
+    Vertex(vec4(-0.5f,  0.5f,  0.5f), vec4(0.6f, 0.6f, 0.6f, 1.0f)),
+
+    Vertex(vec4(-0.5f, -0.5f,  0.5f), vec4(0.5f, 0.5f, 0.0f, 1.0f)),
+    Vertex(vec4( 0.5f, -0.5f,  0.5f), vec4(0.5f, 0.5f, 0.0f, 1.0f)),
+    Vertex(vec4( 0.5f, -0.5f, -0.5f), vec4(0.5f, 0.5f, 0.0f, 1.0f)),
+    Vertex(vec4(-0.5f, -0.5f, -0.5f), vec4(0.5f, 0.5f, 0.0f, 1.0f)),
+
+    Vertex(vec4( 0.5f, -0.5f, -0.5f), vec4(0.4f, 0.0f, 0.0f, 1.0f)),
+    Vertex(vec4( 0.5f, -0.5f,  0.5f), vec4(0.4f, 0.0f, 0.0f, 1.0f)),
+    Vertex(vec4( 0.5f,  0.5f,  0.5f), vec4(0.4f, 0.0f, 0.0f, 1.0f)),
+    Vertex(vec4( 0.5f,  0.5f, -0.5f), vec4(0.4f, 0.0f, 0.0f, 1.0f)),
+
+    Vertex(vec4( 0.5f, -0.5f,  0.5f), vec4(0.0f, 0.0f, 0.5f, 1.0f)),
+    Vertex(vec4(-0.5f, -0.5f,  0.5f), vec4(0.0f, 0.0f, 0.5f, 1.0f)),
+    Vertex(vec4(-0.5f,  0.5f,  0.5f), vec4(0.0f, 0.0f, 0.5f, 1.0f)),
+    Vertex(vec4( 0.5f,  0.5f,  0.5f), vec4(0.0f, 0.0f, 0.5f, 1.0f)),
 };
 
-unsigned int indices[] = {0, 1, 2};
+unsigned int indices[] = {
+    0,  1,  2,      0,  2,  3,      // front
+    4,  5,  6,      4,  6,  7,      // left
+    8,  9,  10,     8,  10, 11,     // top
+    12, 13, 14,     12, 14, 15,     // down
+    16, 17, 18,     16, 18, 19,     // right
+    20, 21, 22,     20, 22, 23,     // back
+};
 
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
@@ -58,8 +91,8 @@ int main() {
         uint64_t A = SDL_GetTicksNS();
 
         cube.model = IDENTITY_MAT4;
-        // float t = (float)A / 1000000000.0f;
-        // rotate(&cube.model, quat_rotation(vec3(1.0f, 1.0f, 1.0f), t));
+        float t = (float)A / 1000000000.0f;
+        rotate(&cube.model, quat_rotation(vec3(1.0f, 1.0f, 1.0f), t));
 
         uint64_t B = SDL_GetTicksNS();
 
