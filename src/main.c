@@ -11,33 +11,13 @@
 const int WIDTH = 1280; // must be multiple of 8
 const int HEIGHT = 720;
 
-// Vertex vertices[8] = {
-//     Vertex(vec4(-0.5f, -0.5f, -0.5f), vec4(1.0f, 1.0f, 1.0f, 1.0f)),
-//     Vertex(vec4(-0.5f, -0.5f,  0.5f), vec4(1.0f, 1.0f, 1.0f, 1.0f)),
-//     Vertex(vec4(-0.5f,  0.5f, -0.5f), vec4(1.0f, 1.0f, 1.0f, 1.0f)),
-//     Vertex(vec4(-0.5f,  0.5f,  0.5f), vec4(1.0f, 1.0f, 1.0f, 1.0f)),
-//     Vertex(vec4( 0.5f, -0.5f, -0.5f), vec4(1.0f, 1.0f, 1.0f, 1.0f)),
-//     Vertex(vec4( 0.5f, -0.5f,  0.5f), vec4(1.0f, 1.0f, 1.0f, 1.0f)),
-//     Vertex(vec4( 0.5f,  0.5f, -0.5f), vec4(1.0f, 1.0f, 1.0f, 1.0f)),
-//     Vertex(vec4( 0.5f,  0.5f,  0.5f), vec4(1.0f, 1.0f, 1.0f, 1.0f)),
-// };
-
-// unsigned int indices[36] = {
-//     0, 1, 3,    0, 3, 2,
-//     4, 6, 7,    4, 7, 5,
-//     0, 4, 5,    0, 5, 1,
-//     2, 3, 7,    2, 7, 6,
-//     0, 2, 6,    0, 6, 4,
-//     1, 5, 7,    1, 7, 3
-// };
-
-Vertex vertices[3] = {
+Vertex vertices[] = {
     Vertex(vec4( 0.0f,  0.5f,  0.0f), vec4(1.0f, 0.0f, 0.0f, 1.0f)),
     Vertex(vec4(-0.5f, -0.5f,  0.0f), vec4(0.0f, 1.0f, 0.0f, 1.0f)),
     Vertex(vec4( 0.5f, -0.5f,  0.0f), vec4(0.0f, 0.0f, 1.0f, 1.0f))
 };
 
-unsigned int indices[3] = {0, 1, 2};
+unsigned int indices[] = {0, 1, 2};
 
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
@@ -47,6 +27,7 @@ int main() {
 
     SDL_Surface* surface = SDL_GetWindowSurface(window);
     assert(surface && "Failed to get surface!");
+    assert((surface->format == SDL_PIXELFORMAT_XRGB8888 || surface->format == SDL_PIXELFORMAT_ARGB8888) && "Current pixel format is not supported!");
 
     SDL_Surface* canvas = SDL_CreateSurface(WIDTH, HEIGHT, SDL_PIXELFORMAT_RGBA128_FLOAT);
     assert(canvas && "Failed to create canvas!");
@@ -61,17 +42,10 @@ int main() {
     };
     assert(ctx.depth_buffer && "Failed to malloc depth buffer");
 
-    // Object cube = {
-    //     .vertices = vertices,
-    //     .indices = indices,
-    //     .count = 36
-    // };
-
-    Object triangle = {
+    Object cube = {
         .vertices = vertices,
         .indices = indices,
-        .count = 3,
-        .model = IDENTITY_MAT4
+        .count = sizeof(indices) / sizeof(unsigned int)
     };
 
     bool running = true;
@@ -83,11 +57,9 @@ int main() {
 
         uint64_t A = SDL_GetTicksNS();
 
-        triangle.model = IDENTITY_MAT4;
-        float t = (float)A / 1000000000.0f;
-        float r = 0.4f;
-        translate(&triangle.model, vec3(r * cos(t), r * sin(t), 0.0f));
-        rotate(&triangle.model, quat_rotation(vec3(0.0f, 0.0f, 1.0f), t));
+        cube.model = IDENTITY_MAT4;
+        // float t = (float)A / 1000000000.0f;
+        // rotate(&cube.model, quat_rotation(vec3(1.0f, 1.0f, 1.0f), t));
 
         uint64_t B = SDL_GetTicksNS();
 
@@ -98,7 +70,7 @@ int main() {
         uint64_t C = SDL_GetTicksNS();
         
         // Render
-        render(&ctx, &triangle);
+        render(&ctx, &cube);
 
         uint64_t D = SDL_GetTicksNS();
 

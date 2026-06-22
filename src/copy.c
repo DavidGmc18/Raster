@@ -31,6 +31,12 @@ __attribute__((always_inline)) static inline void copy8(const Pixel* src, uint8_
     __m256i u16_4567 = _mm256_packus_epi32(i32_45, i32_67);
 
     __m256i u8_01234567 = _mm256_packus_epi16(u16_0123, u16_4567);
+    
+    const __m256i bgra_mask = _mm256_setr_epi8(
+        2, 1, 0, 3,   6, 5, 4, 7,   10, 9, 8, 11,  14, 13, 12, 15,
+        2, 1, 0, 3,   6, 5, 4, 7,   10, 9, 8, 11,  14, 13, 12, 15
+    );
+    u8_01234567 = _mm256_shuffle_epi8(u8_01234567, bgra_mask);
 
     const __m256i perm = _mm256_setr_epi32(0, 4, 1, 5, 2, 6, 3, 7);
     u8_01234567 = _mm256_permutevar8x32_epi32(u8_01234567, perm);
@@ -48,14 +54,14 @@ __attribute__((always_inline)) static inline void copy1(const Pixel* src, uint8_
     b = (b < 0.0f) ? 0.0f : (b > 255.0f) ? 255.0f : b;
     a = (a < 0.0f) ? 0.0f : (a > 255.0f) ? 255.0f : a;
 
-    dst[0] = (uint8_t)(sqrtf(r) * 255.0f);
+    dst[0] = (uint8_t)(sqrtf(b) * 255.0f);
     dst[1] = (uint8_t)(sqrtf(g) * 255.0f);
-    dst[2] = (uint8_t)(sqrtf(b) * 255.0f);
+    dst[2] = (uint8_t)(sqrtf(r) * 255.0f);
     dst[3] = (uint8_t)(sqrtf(a) * 255.0f);
 }
 
 void copy(const RenderContext* ctx, SDL_Surface* surface) {
-    struct { uint8_t r, g, b, a; }* p = surface->pixels;
+    struct { uint8_t b, g, r, a; }* p = surface->pixels;
 
     for (int y = 0; y < ctx->h; y++) {
         int j = y * ctx->pitch;
@@ -78,7 +84,7 @@ void copy(const RenderContext* ctx, SDL_Surface* surface) {
 #else
 
 void copy(const RenderContext* ctx, SDL_Surface* surface) {
-    struct { uint8_t r, g, b, a; }* p = surface->pixels;
+    struct { uint8_t b, g, r, a; }* p = surface->pixels;
 
     for (int y = 0; y < ctx->h; y++) {
         int i = y * ctx->pitch;
