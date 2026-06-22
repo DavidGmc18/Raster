@@ -1,12 +1,15 @@
 #include "rasterizer.h"
 #include <stdbool.h>
+#include <math.h>
 
 #define UPDATE_BOUNDS(vertex) { \
-    int x = (int)((vertex)->position.x); \
+    int x = (int)floorf((vertex)->position.x); \
     if (x < min_x) min_x = x; \
+    x = (int)ceilf((vertex)->position.x); \
     if (x > max_x) max_x = x; \
-    int y = (int)((vertex)->position.y); \
+    int y = (int)floorf((vertex)->position.y); \
     if (y < min_y) min_y = y; \
+    y = (int)ceilf((vertex)->position.y); \
     if (y > max_y) max_y = y; \
 }
 
