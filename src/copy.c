@@ -4,10 +4,10 @@
 #include <immintrin.h>
 
 __attribute__((always_inline)) static inline void copy8(const Pixel* src, uint8_t* dst) {
-    __m256 f32_01 = _mm256_loadu_ps((float*)&src[0]);
-    __m256 f32_23 = _mm256_loadu_ps((float*)&src[2]);
-    __m256 f32_45 = _mm256_loadu_ps((float*)&src[4]);
-    __m256 f32_67 = _mm256_loadu_ps((float*)&src[6]);
+    __m256 f32_01 = _mm256_load_ps((float*)&src[0]);
+    __m256 f32_23 = _mm256_load_ps((float*)&src[2]);
+    __m256 f32_45 = _mm256_load_ps((float*)&src[4]);
+    __m256 f32_67 = _mm256_load_ps((float*)&src[6]);
 
     // Gamma correction
     f32_01 = _mm256_sqrt_ps(f32_01);
