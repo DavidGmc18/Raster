@@ -2,8 +2,6 @@
 #include <stdbool.h>
 #include <math.h>
 
-#define EPSILON 0.005f
-
 #define UPDATE_BOUNDS(vertex) { \
     int x = (int)floorf((vertex)->position.x); \
     if (x < min_x) min_x = x; \
@@ -88,7 +86,7 @@ void rasterize(const RenderContext* ctx, const Vertex* A, const Vertex* B, const
 
         bool flag = false;
         for (int x = min_x; x < max_x; x++) {
-            if (wa >= -EPSILON && wb >= -EPSILON && wc >= -EPSILON) {
+            if (wa >= 0.0f && wb >= 0.0f && wc >= 0.0f) {
                 if (!flag && x != min_x) {
                     int d = x - min_x;
                     z += d * z_dx;
