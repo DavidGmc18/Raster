@@ -28,3 +28,5 @@ mat4 mat4_mul_mat4(const mat4* a, const mat4* b);
 
 void translate(mat4* mat, vec3 vec);
 void rotate(mat4* mat, quat q);
+
+mat4 ortho_projection(float left, float right, float bottom, float top, float near, float far);

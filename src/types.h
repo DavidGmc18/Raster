@@ -81,6 +81,7 @@ typedef struct pixel_buffer_t {
     int pitch;
     Pixel* pixels;
     float* depth_buffer;
+    mat4 projection;
 } RenderContext;
 
 typedef struct vertex_t {

@@ -71,7 +71,8 @@ int main() {
         .h = canvas->h,
         .pitch = canvas->pitch / sizeof(Pixel),
         .pixels = canvas->pixels,
-        .depth_buffer = aligned_alloc(32, canvas->h * (canvas->pitch / sizeof(Pixel)) * sizeof(float))
+        .depth_buffer = aligned_alloc(32, canvas->h * (canvas->pitch / sizeof(Pixel)) * sizeof(float)),
+        .projection = ortho_projection(0, WIDTH, HEIGHT, 0, 0.0f, 1.0f)
     };
     assert(ctx.depth_buffer && "Failed to malloc depth buffer");
 

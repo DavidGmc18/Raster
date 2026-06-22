@@ -97,7 +97,7 @@ void rasterize(const RenderContext* ctx, const Vertex* A, const Vertex* B, const
                     color.a += d * color_dx.a;
                 }
 
-                if (z <= ctx->depth_buffer[i]) {
+                if (z <= ctx->depth_buffer[i] && z >= -1.0f && z <= 1.0f) {
                     ctx->pixels[i].r += color.a * (color.r - ctx->pixels[i].r);
                     ctx->pixels[i].g += color.a * (color.g - ctx->pixels[i].g);
                     ctx->pixels[i].b += color.a * (color.b - ctx->pixels[i].b);

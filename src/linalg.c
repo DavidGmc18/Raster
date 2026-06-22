@@ -100,7 +100,37 @@ inline void translate(mat4* mat, vec3 vec) {
     mat->z.w = vec.z;
 }
 
-void rotate(mat4* mat, quat q) {
+inline void rotate(mat4* mat, quat q) {
     mat4 qm = quat_to_mat4(q);
     *mat = mat4_mul_mat4(mat, &qm);
+}
+
+inline mat4 ortho_projection(float left, float right, float bottom, float top, float near, float far) {
+    vec3 scale = vec3(
+        (float)(right - left) / 2.0f,
+        (float)(top - bottom) / 2.0f,
+        (float)(far - near) / 2.0f
+    );
+
+    float abs_scale_x = fabsf(scale.x);
+    float abs_scale_y = fabsf(scale.y);
+
+    if (abs_scale_x > abs_scale_y) {
+        scale.x = (scale.x / abs_scale_x) * abs_scale_y;
+    } else if (abs_scale_y > abs_scale_x) {
+        scale.y = (scale.y / abs_scale_y) * abs_scale_x;
+    }
+
+    vec3 offset = vec3(
+        (float)(left + right) / 2.0f,
+        (float)(bottom + top) / 2.0f,
+        (float)(near + far) / 2.0f
+    );
+
+    return mat4(
+        scale.x, 0.0f, 0.0f, offset.x,
+        0.0f, scale.y, 0.0f, offset.y,
+        0.0f, 0.0f, scale.z, offset.z, 
+        0.0f, 0.0f, 0.0f, 1.0f
+    );
 }
