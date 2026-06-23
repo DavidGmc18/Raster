@@ -77,9 +77,14 @@ void clearDepthBuffer(const RenderContext* ctx, float clear_value) {
 
 // TODO move out of this file
 // TODO better vertex shader
-void vertex_shader(const RenderContext* ctx, const Object* obj, Vertex* vertex) {
+inline static void vertex_shader(const RenderContext* ctx, const Object* obj, Vertex* vertex) {
     vertex->position = mat4_mul_vec4(&obj->model, &vertex->position);
     vertex->position = mat4_mul_vec4(&ctx->projection, &vertex->position);
+}
+
+inline static void convert_to_ndc(const RenderContext* ctx, Vertex* vertex) {
+    vertex->position.x = ((vertex->position.x / 2.0f) + 0.5f) * ctx->w;
+    vertex->position.y = ((vertex->position.y / 2.0f) + 0.5f) * ctx->h;
 }
 
 void render(const RenderContext* ctx, const Object* obj) {
@@ -99,6 +104,10 @@ void render(const RenderContext* ctx, const Object* obj) {
         vertex_shader(ctx, obj, &v0);
         vertex_shader(ctx, obj, &v1);
         vertex_shader(ctx, obj, &v2);
+
+        convert_to_ndc(ctx, &v0);
+        convert_to_ndc(ctx, &v1);
+        convert_to_ndc(ctx, &v2);
 
         rasterize(ctx, &v0, &v1, &v2);
     }

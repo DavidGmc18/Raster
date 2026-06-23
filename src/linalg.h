@@ -29,4 +29,12 @@ mat4 mat4_mul_mat4(const mat4* a, const mat4* b);
 void translate(mat4* mat, vec3 vec);
 void rotate(mat4* mat, quat q);
 
-mat4 ortho_projection(float left, float right, float bottom, float top, float near, float far);
+enum ProjectionMode {
+    PROJECTION_PRESERVE_ASPECT,
+    PROJECTION_ADAPT_WIDTH,
+    PROJECTION_ADAPT_HEIGHT,
+    PROJECTION_UNIFORM_SCALE_INSIDE,
+    PROJECTION_UNIFORM_SCALE_OUTSIDE
+};
+
+mat4 ortho_projection(enum ProjectionMode mode, float aspect, float near, float far);
