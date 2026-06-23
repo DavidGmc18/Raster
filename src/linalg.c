@@ -109,7 +109,7 @@ inline mat4 ortho_projection(float left, float right, float bottom, float top, f
     vec3 scale = vec3(
         (float)(right - left) / 2.0f,
         (float)(top - bottom) / 2.0f,
-        (float)(far - near) / 2.0f
+        1.0f / (float)(far - near)
     );
 
     float abs_scale_x = fabsf(scale.x);
@@ -124,7 +124,7 @@ inline mat4 ortho_projection(float left, float right, float bottom, float top, f
     vec3 offset = vec3(
         (float)(left + right) / 2.0f,
         (float)(bottom + top) / 2.0f,
-        (float)(near + far) / 2.0f
+        -near * scale.z
     );
 
     return mat4(
