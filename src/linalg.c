@@ -95,9 +95,9 @@ inline mat4 mat4_mul_mat4(const mat4* a, const mat4* b) {
 
 
 inline void translate(mat4* mat, vec3 vec) {
-    mat->x.w = vec.x;
-    mat->y.w = vec.y;
-    mat->z.w = vec.z;
+    mat->x.w += vec.x;
+    mat->y.w += vec.y;
+    mat->z.w += vec.z;
 }
 
 inline void rotate(mat4* mat, quat q) {
@@ -105,7 +105,13 @@ inline void rotate(mat4* mat, quat q) {
     *mat = mat4_mul_mat4(mat, &qm);
 }
 
-inline mat4 ortho_projection(enum ProjectionMode mode, float aspect, float near, float far) {
+inline void scale(mat4* mat, vec3 vec) {
+    mat->x.x *= vec.x;
+    mat->y.y *= vec.y;
+    mat->z.z *= vec.z;
+}
+
+static inline vec3 get_projection_scale(enum ProjectionMode mode, float aspect, float near, float far) {
     vec3 scale = vec3(1.0f, 1.0f, 1.0f / (float)(far - near));
     switch (mode) {
         case PROJECTION_PRESERVE_ASPECT: break;
@@ -134,11 +140,27 @@ inline mat4 ortho_projection(enum ProjectionMode mode, float aspect, float near,
             }
             break;
     }
+    return scale;
+}
 
+inline mat4 ortho_projection(enum ProjectionMode mode, float aspect, float near, float far) {
+    vec3 scale = get_projection_scale(mode, aspect, near, far);
     return mat4(
-        scale.x, 0.0f, 0.0f, 0.0f,
-        0.0f, scale.y, 0.0f, 0.0f,
-        0.0f, 0.0f, scale.z, -near * scale.z, 
-        0.0f, 0.0f, 0.0f, 1.0f
+        scale.x,    0.0f,       0.0f,       0.0f,
+        0.0f,       scale.y,    0.0f,       0.0f,
+        0.0f,       0.0f,       scale.z,    -near * scale.z, 
+        0.0f,       0.0f,       0.0f,       1.0f
+    );
+}
+
+inline mat4 perspective_projection(enum ProjectionMode mode, float aspect, float near, float far, float fov) {
+
+    vec3 scale = get_projection_scale(mode, aspect, near, far);
+    float tan = tanf(fov / 2.0f);
+    return mat4(
+        scale.x / tan,  0.0f,           0.0f,       0.0f,
+        0.0f,           scale.y / tan,  0.0f,       0.0f,
+        0.0f,           0.0f,           scale.z,    -near * scale.z, 
+        0.0f,           0.0f,           1.0f,       0.0f
     );
 }

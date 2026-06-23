@@ -72,7 +72,7 @@ int main() {
         .pitch = canvas->pitch / sizeof(Pixel),
         .pixels = canvas->pixels,
         .depth_buffer = aligned_alloc(32, canvas->h * (canvas->pitch / sizeof(Pixel)) * sizeof(float)),
-        .projection = ortho_projection(PROJECTION_UNIFORM_SCALE_INSIDE, (float)WIDTH / (float)HEIGHT, 0.0f, 10.0f)
+        .projection = perspective_projection(PROJECTION_UNIFORM_SCALE_INSIDE, (float)WIDTH / (float)HEIGHT, 0.0f, 10.0f, M_PI / 2.0f)
     };
     assert(ctx.depth_buffer && "Failed to malloc depth buffer");
 
@@ -94,7 +94,7 @@ int main() {
         cube.model = IDENTITY_MAT4;
         float t = (float)A / 1000000000.0f;
         rotate(&cube.model, quat_rotation(vec3(1.0f, 1.0f, 1.0f), t));
-        translate(&cube.model, vec3(0.0f, 0.0f, 1.0f));
+        translate(&cube.model, vec3(0.0f, 0.0f, 2.0f));
 
         uint64_t B = SDL_GetTicksNS();
 
