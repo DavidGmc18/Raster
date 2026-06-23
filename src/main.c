@@ -11,7 +11,7 @@
 const int WIDTH = 1280; // must be multiple of 8
 const int HEIGHT = 720;
 
-Vertex vertices[] = {
+Vertex cube_vertices[] = {
     Vertex(vec4(-0.5f, -0.5f, -0.5f), vec4(0.0f, 0.6f, 0.0f, 1.0f)),
     Vertex(vec4( 0.5f, -0.5f, -0.5f), vec4(0.0f, 0.6f, 0.0f, 1.0f)),
     Vertex(vec4( 0.5f,  0.5f, -0.5f), vec4(0.0f, 0.6f, 0.0f, 1.0f)),
@@ -43,13 +43,42 @@ Vertex vertices[] = {
     Vertex(vec4( 0.5f,  0.5f,  0.5f), vec4(0.0f, 0.0f, 0.5f, 1.0f)),
 };
 
-unsigned int indices[] = {
+unsigned int cube_indices[] = {
     0,  1,  2,      0,  2,  3,      // front
     4,  5,  6,      4,  6,  7,      // left
     8,  9,  10,     8,  10, 11,     // top
     12, 13, 14,     12, 14, 15,     // down
     16, 17, 18,     16, 18, 19,     // right
     20, 21, 22,     20, 22, 23,     // back
+};
+
+Vertex ground_vertices[] = {
+    Vertex(vec4(-0.5f,  0.0f, -0.5f), GRAY(0.5f, 1.0f)),
+    Vertex(vec4( 0.0f,  0.0f, -0.5f), GRAY(0.5f, 1.0f)),
+    Vertex(vec4( 0.0f,  0.0f,  0.0f), GRAY(0.5f, 1.0f)),
+    Vertex(vec4(-0.5f,  0.0f,  0.0f), GRAY(0.5f, 1.0f)),
+
+    Vertex(vec4( 0.0f,  0.0f, -0.5f), GRAY(0.1f, 1.0f)),
+    Vertex(vec4( 0.5f,  0.0f, -0.5f), GRAY(0.1f, 1.0f)),
+    Vertex(vec4( 0.5f,  0.0f,  0.0f), GRAY(0.1f, 1.0f)),
+    Vertex(vec4( 0.0f,  0.0f,  0.0f), GRAY(0.1f, 1.0f)),
+
+    Vertex(vec4( 0.0f,  0.0f,  0.0f), GRAY(0.5f, 1.0f)),
+    Vertex(vec4( 0.5f,  0.0f,  0.0f), GRAY(0.5f, 1.0f)),
+    Vertex(vec4( 0.5f,  0.0f,  0.5f), GRAY(0.5f, 1.0f)),
+    Vertex(vec4( 0.0f,  0.0f,  0.5f), GRAY(0.5f, 1.0f)),
+
+    Vertex(vec4(-0.5f,  0.0f,  0.0f), GRAY(0.1f, 1.0f)),
+    Vertex(vec4( 0.0f,  0.0f,  0.0f), GRAY(0.1f, 1.0f)),
+    Vertex(vec4( 0.0f,  0.0f,  0.5f), GRAY(0.1f, 1.0f)),
+    Vertex(vec4(-0.5f,  0.0f,  0.5f), GRAY(0.1f, 1.0f)),
+};
+
+unsigned int ground_indices[] = {
+    0,  1,  2,      0,  2,  3,
+    4,  5,  6,      4,  6,  7,
+    8,  9,  10,     8,  10, 11,
+    12, 13, 14,     12, 14, 15,
 };
 
 int main() {
@@ -72,14 +101,20 @@ int main() {
         .pitch = canvas->pitch / sizeof(Pixel),
         .pixels = canvas->pixels,
         .depth_buffer = aligned_alloc(32, canvas->h * (canvas->pitch / sizeof(Pixel)) * sizeof(float)),
-        .projection = perspective_projection(PROJECTION_UNIFORM_SCALE_INSIDE, (float)WIDTH / (float)HEIGHT, 0.0f, 10.0f, M_PI / 2.0f)
+        .projection = perspective_projection(PROJECTION_UNIFORM_SCALE_INSIDE, (float)WIDTH / (float)HEIGHT, 0.001f, 10.0f, M_PI / 2.0f)
     };
     assert(ctx.depth_buffer && "Failed to malloc depth buffer");
 
     Object cube = {
-        .vertices = vertices,
-        .indices = indices,
-        .count = sizeof(indices) / sizeof(unsigned int)
+        .vertices = cube_vertices,
+        .indices = cube_indices,
+        .count = sizeof(cube_indices) / sizeof(unsigned int)
+    };
+
+    Object ground = {
+        .vertices = ground_vertices,
+        .indices = ground_indices,
+        .count = sizeof(ground_indices) / sizeof(unsigned int)
     };
 
     bool running = true;
@@ -96,6 +131,10 @@ int main() {
         rotate(&cube.model, quat_rotation(vec3(1.0f, 1.0f, 1.0f), t));
         translate(&cube.model, vec3(0.0f, 0.0f, 2.0f));
 
+        ground.model = IDENTITY_MAT4;
+        scale(&ground.model, vec3(3.0f, 3.0f, 3.0f));
+        translate(&ground.model, vec3(0.0f, -1.0f, 2.0f));
+
         uint64_t B = SDL_GetTicksNS();
 
         // Clear buffers
@@ -106,6 +145,7 @@ int main() {
         
         // Render
         render(&ctx, &cube);
+        render(&ctx, &ground);
 
         uint64_t D = SDL_GetTicksNS();
 

@@ -27,6 +27,8 @@ typedef union vec4_t {
     struct { float r, g, b, a; };
 } vec4;
 
+#define GRAY(rgb, a) (vec4((rgb), (rgb), (rgb), (a)))
+
 #define _vec4_dispatch(_1, _2, _3, _4, MACRO, ...) MACRO
 #define _vec4_3f(_v0, _v1, _v2)    ((vec4){.v = {(_v0), (_v1), (_v2), 1.0f}})
 #define _vec4_4f(_v0, _v1, _v2, _v3) ((vec4){.v = {(_v0), (_v1), (_v2), (_v3)}})
