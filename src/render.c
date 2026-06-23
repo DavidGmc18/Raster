@@ -82,9 +82,14 @@ inline static void vertex_shader(const RenderContext* ctx, const Object* obj, Ve
     vertex->position = mat4_mul_vec4(&ctx->projection, &vertex->position);
 }
 
-inline static void convert_to_ndc(const RenderContext* ctx, Vertex* vertex) {
+inline static void post_projection_transform(const RenderContext* ctx, Vertex* vertex) {
+    // Perspective divide
+    vertex->position.x /= vertex->position.w;
+    vertex->position.y /= vertex->position.w;
+
+    // Convert to NDC
     vertex->position.x = ((vertex->position.x / 2.0f) + 0.5f) * ctx->w;
-    vertex->position.y = ((vertex->position.y / 2.0f) + 0.5f) * ctx->h;
+    vertex->position.y = ((-vertex->position.y / 2.0f) + 0.5f) * ctx->h;
 }
 
 void render(const RenderContext* ctx, const Object* obj) {
@@ -105,9 +110,9 @@ void render(const RenderContext* ctx, const Object* obj) {
         vertex_shader(ctx, obj, &v1);
         vertex_shader(ctx, obj, &v2);
 
-        convert_to_ndc(ctx, &v0);
-        convert_to_ndc(ctx, &v1);
-        convert_to_ndc(ctx, &v2);
+        post_projection_transform(ctx, &v0);
+        post_projection_transform(ctx, &v1);
+        post_projection_transform(ctx, &v2);
 
         rasterize(ctx, &v0, &v1, &v2);
     }
