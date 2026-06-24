@@ -29,6 +29,15 @@ vec4 _negate_vec4(vec4 vec);
     vec4: _negate_vec4 \
 )(vec)
 
+vec2 _lerp_vec2(vec2 a, vec2 b, float t);
+vec3 _lerp_vec3(vec3 a, vec3 b, float t);
+vec4 _lerp_vec4(vec4 a, vec4 b, float t);
+#define lerp(a, b, t) _Generic((a), \
+    vec2: _lerp_vec2, \
+    vec3: _lerp_vec3, \
+    vec4: _lerp_vec4 \
+)(a, b, t)
+
 quat quat_rotation(vec3 axis, float angle);
 quat conjugate(quat q);
 mat4 quat_to_mat4(quat q);

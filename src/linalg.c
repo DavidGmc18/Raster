@@ -55,6 +55,34 @@ inline vec4 _negate_vec4(vec4 vec) {
 }
 
 
+inline vec2 _lerp_vec2(vec2 a, vec2 b, float t) {
+    float i = 1.0f - t;
+    return vec2(
+        i * a.x + t * b.x,
+        i * a.y + t * b.y
+    );
+}
+
+inline vec3 _lerp_vec3(vec3 a, vec3 b, float t) {
+    float i = 1.0f - t;
+    return vec3(
+        i * a.x + t * b.x,
+        i * a.y + t * b.y,
+        i * a.z + t * b.z
+    );
+}
+
+inline vec4 _lerp_vec4(vec4 a, vec4 b, float t) {
+    float i = 1.0f - t;
+    return vec4(
+        i * a.x + t * b.x,
+        i * a.y + t * b.y,
+        i * a.z + t * b.z,
+        i * a.w + t * b.w
+    );
+}
+
+
 inline quat quat_rotation(vec3 axis, float angle) {
     axis = normalize(axis);
     angle /= 2.0f;
