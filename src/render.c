@@ -2,6 +2,8 @@
 #include <assert.h>
 #include "rasterizer.h"
 #include "linalg.h"
+#include <stdbool.h>
+
 #if defined(__AVX2__)
 #include <immintrin.h>
 
@@ -83,7 +85,7 @@ inline static void vertex_shader(const RenderContext* ctx, const Object* obj, Ve
     vertex->position = mat4_mul_vec4(&ctx->projection, &vertex->position);
 }
 
-inline static void post_projection_transform(const RenderContext* ctx, Vertex* vertex) {
+inline static void post_clip_transform(const RenderContext* ctx, Vertex* vertex) {
     // Perspective divide
     vertex->position.x /= vertex->position.w;
     vertex->position.y /= vertex->position.w;
@@ -92,6 +94,12 @@ inline static void post_projection_transform(const RenderContext* ctx, Vertex* v
     vertex->position.x = ((vertex->position.x / 2.0f) + 0.5f) * ctx->w;
     vertex->position.y = ((-vertex->position.y / 2.0f) + 0.5f) * ctx->h;
 }
+
+#define CLIP(v_in, v_out, near, v_new) do { \
+    float _t = ((near) - (v_in).position.w) / ((v_out).position.w - (v_in).position.w); \
+    (v_new).position = lerp((v_in).position, (v_out).position, _t); \
+    (v_new).color = lerp((v_in).color, (v_out).color, _t); \
+} while (0)
 
 void render(const RenderContext* ctx, const Object* obj) {
     assert(ctx && "Render context is NULL!");
@@ -106,15 +114,57 @@ void render(const RenderContext* ctx, const Object* obj) {
         Vertex v0 = obj->vertices[i0];
         Vertex v1 = obj->vertices[i1];
         Vertex v2 = obj->vertices[i2];
+        Vertex v3;
 
         vertex_shader(ctx, obj, &v0);
         vertex_shader(ctx, obj, &v1);
         vertex_shader(ctx, obj, &v2);
 
-        post_projection_transform(ctx, &v0);
-        post_projection_transform(ctx, &v1);
-        post_projection_transform(ctx, &v2);
+        // Clip
+        float near = -ctx->projection.z.w / ctx->projection.z.z;
+        
+        bool clip_v0 = v0.position.w < near;
+        bool clip_v1 = v1.position.w < near;
+        bool clip_v2 = v2.position.w < near;
+
+        bool render_v3 = false;
+
+        if (clip_v0 && clip_v1 && clip_v2) {
+            continue;
+        } else if (clip_v0 && clip_v1 && !clip_v2) {
+            CLIP(v2, v0, near, v0);
+            CLIP(v2, v1, near, v1);
+        } else if (clip_v0 && !clip_v1 && clip_v2) {
+            CLIP(v1, v0, near, v0);
+            CLIP(v1, v2, near, v2);
+        } else if (!clip_v0 && clip_v1 && clip_v2) {
+            CLIP(v0, v1, near, v1);
+            CLIP(v0, v2, near, v2);
+        } else if (!clip_v0 && !clip_v1 && clip_v2) {
+            render_v3 = true;
+            CLIP(v0, v2, near, v3);
+            CLIP(v1, v2, near, v2);
+        } else if (clip_v0 && !clip_v1 && !clip_v2) {
+            render_v3 = true;
+            CLIP(v2, v0, near, v3);
+            CLIP(v1, v0, near, v0);
+        } else if (!clip_v0 && clip_v1 && !clip_v2) {
+            render_v3 = true;
+            v3 = v2;
+            CLIP(v2, v1, near, v2);
+            CLIP(v0, v1, near, v1);
+        }
+
+        // Post clip
+        post_clip_transform(ctx, &v0);
+        post_clip_transform(ctx, &v1);
+        post_clip_transform(ctx, &v2);
 
         rasterize(ctx, &v0, &v1, &v2);
+
+        if (render_v3) {
+            post_clip_transform(ctx, &v3);
+            rasterize(ctx, &v0, &v2, &v3);
+        }
     }
 }
