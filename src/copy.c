@@ -49,10 +49,10 @@ __attribute__((always_inline)) static inline void copy1(const Pixel* src, uint8_
     float b = src->b;
     float a = src->a;
 
-    r = (r < 0.0f) ? 0.0f : (r > 255.0f) ? 255.0f : r;
-    g = (g < 0.0f) ? 0.0f : (g > 255.0f) ? 255.0f : g;
-    b = (b < 0.0f) ? 0.0f : (b > 255.0f) ? 255.0f : b;
-    a = (a < 0.0f) ? 0.0f : (a > 255.0f) ? 255.0f : a;
+    r = (r < 0.0f) ? 0.0f : (r > 1.0f) ? 1.0f : r;
+    g = (g < 0.0f) ? 0.0f : (g > 1.0f) ? 1.0f : g;
+    b = (b < 0.0f) ? 0.0f : (b > 1.0f) ? 1.0f : b;
+    a = (a < 0.0f) ? 0.0f : (a > 1.0f) ? 1.0f : a;
 
     dst[0] = (uint8_t)(sqrtf(b) * 255.0f);
     dst[1] = (uint8_t)(sqrtf(g) * 255.0f);
@@ -89,7 +89,15 @@ void copy(const RenderContext* ctx, SDL_Surface* surface) {
     for (int y = 0; y < ctx->h; y++) {
         int i = y * ctx->pitch;
         for (int x = 0; x < ctx->w; x++) {
-            Pixel pixel = ctx->pixels[i];
+            float r = ctx->pixels[i].r;
+            float g = ctx->pixels[i].g;
+            float b = ctx->pixels[i].b;
+            float a = ctx->pixels[i].a;
+
+            r = (r < 0.0f) ? 0.0f : (r > 1.0f) ? 1.0f : r;
+            g = (g < 0.0f) ? 0.0f : (g > 1.0f) ? 1.0f : g;
+            b = (b < 0.0f) ? 0.0f : (b > 1.0f) ? 1.0f : b;
+            a = (a < 0.0f) ? 0.0f : (a > 1.0f) ? 1.0f : a;
             
             p[i].r = (uint8_t)(sqrtf(pixel.r) * 255.0f);
             p[i].g = (uint8_t)(sqrtf(pixel.g) * 255.0f);
