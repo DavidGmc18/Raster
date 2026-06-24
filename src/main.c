@@ -101,11 +101,8 @@ int main() {
         .pitch = canvas->pitch / sizeof(Pixel),
         .pixels = canvas->pixels,
         .depth_buffer = aligned_alloc(32, canvas->h * (canvas->pitch / sizeof(Pixel)) * sizeof(float)),
-        .view = IDENTITY_MAT4,
         .projection = perspective_projection(PROJECTION_UNIFORM_SCALE_INSIDE, (float)WIDTH / (float)HEIGHT, 0.001f, 10.0f, M_PI / 2.0f)
     };
-    translate(&ctx.view, vec3(0.0f, -2.0f, 2.0f));
-    rotate(&ctx.view, quat_rotation(vec3(1.0f, 0.0f, 0.0f), 0.25f * M_PI));
     assert(ctx.depth_buffer && "Failed to malloc depth buffer");
 
     Object cube = {
@@ -122,14 +119,43 @@ int main() {
     };
     scale(&ground.model, vec3(3.0f, 3.0f, 3.0f));
 
+    vec3 camera_pos = vec3(0.0f, 2.0f, -2.0f);
+    vec2 camera_angles = vec2(0.0f, 0.0f);
+
     bool running = true;
     while (running) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_EVENT_QUIT) running = false;
+            switch (event.type) {
+                case SDL_EVENT_QUIT:
+                    running = false;
+                    break;
+
+                case SDL_EVENT_MOUSE_MOTION:
+                    camera_angles.pitch += 0.003f * event.motion.yrel;
+                    camera_angles.yaw += 0.003f * event.motion.xrel;
+                    break;
+            }
         }
 
+        int key_count;
+        const bool* keys = SDL_GetKeyboardState(&key_count);
+
+        const float move_speed = 0.01f;
+        if (keys[SDL_SCANCODE_W]) camera_pos.z += move_speed;
+        if (keys[SDL_SCANCODE_S]) camera_pos.z -= move_speed;
+        if (keys[SDL_SCANCODE_D]) camera_pos.x += move_speed;
+        if (keys[SDL_SCANCODE_A]) camera_pos.x -= move_speed;
+        if (keys[SDL_SCANCODE_LSHIFT]) camera_pos.y += move_speed;
+        if (keys[SDL_SCANCODE_LCTRL]) camera_pos.y -= move_speed;
+
         uint64_t A = SDL_GetTicksNS();
+
+        ctx.view = IDENTITY_MAT4;
+        translate(&ctx.view, negate(camera_pos));
+        quat camera_yaw = quat_rotation(vec3(0, 1, 0), camera_angles.yaw);
+        quat camera_pitch = quat_rotation(vec3(1, 0, 0), camera_angles.pitch);
+        rotate(&ctx.view, conjugate(quat_mul_quat(camera_pitch, camera_yaw)));
 
         cube.model = IDENTITY_MAT4;
         float t = (float)A / 1000000000.0f;

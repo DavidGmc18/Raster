@@ -42,6 +42,19 @@ inline vec4 _normalize_vec4(vec4 vec) {
 }
 
 
+inline vec2 _negate_vec2(vec2 vec) {
+    return vec2(-vec.x, -vec.y);
+}
+
+inline vec3 _negate_vec3(vec3 vec) {
+    return vec3(-vec.x, -vec.y, -vec.z);
+}
+
+inline vec4 _negate_vec4(vec4 vec) {
+    return vec4(-vec.x, -vec.y, -vec.z, -vec.w);
+}
+
+
 inline quat quat_rotation(vec3 axis, float angle) {
     axis = normalize(axis);
     angle /= 2.0f;
@@ -52,6 +65,10 @@ inline quat quat_rotation(vec3 axis, float angle) {
         .k = axis.k * sin,
         .w = cosf(angle)
     };
+}
+
+inline quat conjugate(quat q) {
+    return quat(-q.i, -q.j, -q.k, q.w);
 }
 
 inline mat4 quat_to_mat4(quat q) {
@@ -91,6 +108,15 @@ inline mat4 mat4_mul_mat4(const mat4* a, const mat4* b) {
     for (int k = 0; k < 4; k++)
         c.v[m].v[n] += a->v[m].v[k] * b->v[k].v[n];
     return c;
+}
+
+inline quat quat_mul_quat(quat a, quat b) {
+    return (quat){
+        .w = a.w * b.w - a.i * b.i - a.j * b.j - a.k * b.k,
+        .i = a.w * b.i + a.i * b.w + a.j * b.k - a.k * b.j,
+        .j = a.w * b.j - a.i * b.k + a.j * b.w + a.k * b.i,
+        .k = a.w * b.k + a.i * b.j - a.j * b.i + a.k * b.w
+    };
 }
 
 

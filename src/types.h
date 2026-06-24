@@ -5,6 +5,7 @@ typedef union vec2_t {
     float v[2];
     struct { float x, y; };
     struct { float i, j; };
+    struct { float pitch, yaw; };
 } vec2;
 
 #define vec2(_v0, _v1) ((vec2){.v = {(_v0), (_v1)}})
@@ -15,6 +16,7 @@ typedef union vec3_t {
     struct { float x, y, z; };
     struct { float i, j, k; };
     struct { float r, g, b; };
+    struct { float pitch, yaw, roll; };
 } vec3;
 
 #define vec3(_v0, _v1, _v2) ((vec3){.v = {(_v0), (_v1), (_v2)}})
@@ -27,19 +29,21 @@ typedef union vec4_t {
     struct { float r, g, b, a; };
 } vec4;
 
-#define GRAY(rgb, a) (vec4((rgb), (rgb), (rgb), (a)))
-
 #define _vec4_dispatch(_1, _2, _3, _4, MACRO, ...) MACRO
 #define _vec4_3f(_v0, _v1, _v2)    ((vec4){.v = {(_v0), (_v1), (_v2), 1.0f}})
 #define _vec4_4f(_v0, _v1, _v2, _v3) ((vec4){.v = {(_v0), (_v1), (_v2), (_v3)}})
 #define vec4(...) _vec4_dispatch(__VA_ARGS__, _vec4_4f, _vec4_3f)(__VA_ARGS__)
+
+#define GRAY(rgb, a) (vec4((rgb), (rgb), (rgb), (a)))
 
 // quat
 typedef struct quat_t {
     float i, j, k, w;
 } quat;
 
-#define QUAT_IDENTITY (quat){0.0f, 0.0f, 0.0f, 1.0f}
+#define quat(_v0, _v1, _v2, _v3) ((quat){_v0, _v1, _v2, _v3})
+
+#define QUAT_IDENTITY (quat(0.0f, 0.0f, 0.0f, 1.0f))
 
 // mat4
 typedef union mat4_t {
