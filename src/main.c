@@ -132,9 +132,16 @@ int main() {
                     break;
 
                 case SDL_EVENT_MOUSE_MOTION:
-                    camera_angles.pitch += 0.003f * event.motion.yrel;
-                    camera_angles.yaw += 0.003f * event.motion.xrel;
+                    camera_angles.pitch += -0.003f * event.motion.yrel;
+                    camera_angles.yaw += -0.003f * event.motion.xrel;
                     break;
+
+                case SDL_EVENT_MOUSE_BUTTON_DOWN:
+                    SDL_SetWindowRelativeMouseMode(window, true); break;
+
+                case SDL_EVENT_KEY_DOWN:
+                    if (event.key.scancode == SDL_SCANCODE_ESCAPE) SDL_SetWindowRelativeMouseMode(window, false);
+
             }
         }
 
