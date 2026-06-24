@@ -102,7 +102,7 @@ inline void translate(mat4* mat, vec3 vec) {
 
 inline void rotate(mat4* mat, quat q) {
     mat4 qm = quat_to_mat4(q);
-    *mat = mat4_mul_mat4(mat, &qm);
+    *mat = mat4_mul_mat4(&qm, mat);
 }
 
 inline void scale(mat4* mat, vec3 vec) {

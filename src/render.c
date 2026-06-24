@@ -79,6 +79,7 @@ void clearDepthBuffer(const RenderContext* ctx, float clear_value) {
 // TODO better vertex shader
 inline static void vertex_shader(const RenderContext* ctx, const Object* obj, Vertex* vertex) {
     vertex->position = mat4_mul_vec4(&obj->model, &vertex->position);
+    vertex->position = mat4_mul_vec4(&ctx->view, &vertex->position);
     vertex->position = mat4_mul_vec4(&ctx->projection, &vertex->position);
 }
 

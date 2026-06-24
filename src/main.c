@@ -101,8 +101,11 @@ int main() {
         .pitch = canvas->pitch / sizeof(Pixel),
         .pixels = canvas->pixels,
         .depth_buffer = aligned_alloc(32, canvas->h * (canvas->pitch / sizeof(Pixel)) * sizeof(float)),
+        .view = IDENTITY_MAT4,
         .projection = perspective_projection(PROJECTION_UNIFORM_SCALE_INSIDE, (float)WIDTH / (float)HEIGHT, 0.001f, 10.0f, M_PI / 2.0f)
     };
+    translate(&ctx.view, vec3(0.0f, -2.0f, 2.0f));
+    rotate(&ctx.view, quat_rotation(vec3(1.0f, 0.0f, 0.0f), 0.25f * M_PI));
     assert(ctx.depth_buffer && "Failed to malloc depth buffer");
 
     Object cube = {
@@ -114,8 +117,10 @@ int main() {
     Object ground = {
         .vertices = ground_vertices,
         .indices = ground_indices,
-        .count = sizeof(ground_indices) / sizeof(unsigned int)
+        .count = sizeof(ground_indices) / sizeof(unsigned int),
+        .model = IDENTITY_MAT4
     };
+    scale(&ground.model, vec3(3.0f, 3.0f, 3.0f));
 
     bool running = true;
     while (running) {
@@ -128,12 +133,8 @@ int main() {
 
         cube.model = IDENTITY_MAT4;
         float t = (float)A / 1000000000.0f;
-        rotate(&cube.model, quat_rotation(vec3(1.0f, 1.0f, 1.0f), t));
-        translate(&cube.model, vec3(0.0f, 0.0f, 2.0f));
-
-        ground.model = IDENTITY_MAT4;
-        scale(&ground.model, vec3(3.0f, 3.0f, 3.0f));
-        translate(&ground.model, vec3(0.0f, -1.0f, 2.0f));
+        rotate(&cube.model, quat_rotation(vec3(0.0f, 1.0f, 0.0f), t));
+        translate(&cube.model, vec3(0.0f, 1.0f, 0.0f));
 
         uint64_t B = SDL_GetTicksNS();
 
